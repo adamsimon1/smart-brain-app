@@ -9,12 +9,26 @@ import SignIn from './components/SignIn/SignIn.js';
 import Register from './components/Register/Register.js';
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
-
 import './App.css';
 
 const app = new Clarifai.App({
- apiKey: 'dc972a901ce94d4480049199129a0211'
-});
+  apiKey: 'dc972a901ce94d4480049199129a0211'
+ });
+
+const intitialState = {
+  input: '',
+  imageUrl: '',
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
 
 const particlesOptions = {
   particles: {
@@ -30,20 +44,7 @@ const particlesOptions = {
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageUrl: '',
-      box: {},
-      route: 'signin',
-      isSignedIn: false,
-      user: {
-        id: '',
-        name: '',
-        email: '',
-        entries: 0,
-        joined: ''
-      }
-    }
+    this.state = intitialState;
   }
 
   loadUser = (data) => {
@@ -58,7 +59,7 @@ class App extends React.Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-      this.setState({isSignedIn: false})
+      this.setState(intitialState)
     } else if (route === 'home') {
       this.setState({isSignedIn: true})
     }
@@ -96,10 +97,11 @@ class App extends React.Component {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({id: this.state.user.id})
           })
-          .then(response => response.json())
-          .then(count => {
-            this.setState(Object.assign(this.state.user, {entries: count}))
-          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, {entries: count}))
+            })
+            .catch(console.log)
         }
         this.displayFaceBox(this.calculateFaceLocation(response))
       })
